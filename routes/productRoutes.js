@@ -50,4 +50,61 @@ router.post("/", async (req, res) => {
   }
 });
 
+// get /api/products/:id (get a single product by id)
+router.get("/:id", async (req, res) => {
+  try {
+    // try finding the product by its id
+    const found = await product.findById(req.params.id);
+
+    if (!found) {
+      // no product with that id in database
+      return res.status(404).json({ error: "product not found" });
+    }
+
+    res.json(found);
+  } catch (error) {
+    // likely an invalid object id format
+    res.status(400).json({ error: "invalid product id" });
+  }
+});
+
+// put /api/products/:id (update a product by id)
+router.put("/:id", async (req, res) => {
+  try {
+    // update product and return the new version
+    const updated = await product.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updated) {
+      // nothing to update if id not found
+      return res.status(404).json({ error: "product not found" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    // validation error or some other wierd issue
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// delete /api/products/:id (delete a product by id)
+router.delete("/:id", async (req, res) => {
+  try {
+    // try deleting the product with this id
+    const deleted = await product.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      // nothing was deleted because id did not match anything
+      return res.status(404).json({ error: "product not found" });
+    }
+
+    res.json({ message: "product deleted succesfully" });
+  } catch (error) {
+    // usually bad id format
+    res.status(400).json({ error: "invalid product id" });
+  }
+});
+
 module.exports = router;
