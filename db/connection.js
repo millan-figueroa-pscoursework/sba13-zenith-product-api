@@ -2,15 +2,15 @@ const mongoose = require("mongoose");
 
 const uri = process.env.MONGO_URI;
 
-async function run() {
-  try {
-    // connct the client to the server
-    await mongoose.connect(uri);
-    // establish and verify connection
-    console.log("Connected successfully to Mongodb!");
-  } catch (error) {
-    console.error("Database connection error:", error);
-  }
+if (!uri) {
+  console.error("MONGO_URI not found in .env file");
+  process.exit(1);
 }
 
-run();
+mongoose
+  .connect(uri)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((error) => {
+    console.error("MongoDB connection error:", error);
+    process.exit(1); // stop srver if db fails
+  });
