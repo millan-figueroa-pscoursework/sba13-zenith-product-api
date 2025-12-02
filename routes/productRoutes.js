@@ -3,8 +3,6 @@ const product = require("../models/Product");
 
 const router = express.Router();
 
-module.exports = router;
-
 // get /api/products (supports filters sorting pagination)
 router.get("/", async (req, res) => {
   try {
@@ -35,7 +33,21 @@ router.get("/", async (req, res) => {
     const products = await query.skip(skip).limit(limitnumber);
     res.json(products);
   } catch (error) {
-    // some wierd database or query problem
+    // somthing failed maybe database or query issue
     res.status(500).json({ error: "failed to fetch products with filters" });
   }
 });
+
+// post /api/products (create a new product)
+router.post("/", async (req, res) => {
+  try {
+    // create a new product from request body data
+    const newproduct = await product.create(req.body);
+    res.status(201).json(newproduct);
+  } catch (error) {
+    // validation failed or other bad input stuff
+    res.status(400).json({ error: error.message });
+  }
+});
+
+module.exports = router;
